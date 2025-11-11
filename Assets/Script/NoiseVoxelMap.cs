@@ -5,13 +5,7 @@ using UnityEngine;
 
 public class NoiseVoxelMap : MonoBehaviour
 {
-    class TileInfo
-    {
-        public int tileX;
-        public int tileY;
-        public int tileZ;
-        public string tileType;
-    }
+   
     public GameObject dirtPrefab;
     public GameObject waterPrefab;
     public GameObject grassPrefab;
@@ -19,8 +13,8 @@ public class NoiseVoxelMap : MonoBehaviour
     public int width = 20;
     public int depth = 20;
     public int maxHeight = 16;  //Y
+    public int waterLevel = 4;
     [SerializeField] float noiseScale = 20f; // 값이 높을수록 평평한 지형
-    List<TileInfo> tileInfos = new List<TileInfo>();
     // Start is called before the first frame update
     void Start()
     {
@@ -38,8 +32,7 @@ public class NoiseVoxelMap : MonoBehaviour
 
                 int h = Mathf.FloorToInt(noise * maxHeight);
 
-                if (h <= 0) continue;
-
+                if (h <= 0) h = 1;
                 for (int y = 0; y <= h; y++)
                 {
                     if ( y ==  h )
@@ -48,62 +41,54 @@ public class NoiseVoxelMap : MonoBehaviour
                     }
                     else
                     {
-                        Place(x, y, z);
+                        PlaceDirt(x, y, z);
                     }
+                }
+                for (int y = h +1; y <= waterLevel; y ++)
+                {
+                    PlaceWater(x, y, z);
                 }
             }
         }
         
-        for (int x = 0; x < width; x++)
-        {
-            for (int z = 0; z < depth; z++)
-            {
-                for (int y = 0; y <= 4; y++)
-                {
-                    if (tileInfos.Find(tile => tile.tileX == x && tile.tileZ == z && tile.tileY == y) == null)
-                    {
-                        PlaceWater(x, y, z);
-                    }
-                }
-            }
-        }
     }
 
-    private void Place (int x, int y, int z)
+    private void PlaceDirt (int x, int y, int z)
     {
         var go = Instantiate(dirtPrefab, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"B_{x}_{y}_{z}";
-        tileInfos.Add(new TileInfo
-        {
-            tileX = x,
-            tileY = y,
-            tileZ = z,
-            tileType = "Dirt"
-        });
-        
+        go.name = $"Dirt_{x}_{y}_{z}";
+
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = BlockType.Dirt;
+        b.maxHP = 3;
+        b.dropcount = 1;
+        b.mineable = true;
+       
     }
     private void PlaceGrass(int x, int y, int z)
     {
         var go = Instantiate(grassPrefab, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"B_{x}_{y}_{z}";
-        tileInfos.Add(new TileInfo
-        {
-            tileX = x,
-            tileY = y,
-            tileZ = z,
-            tileType = "Grass"
-        });
-    }private void PlaceWater(int x, int y, int z)
+        go.name = $"Grass_{x}_{y}_{z}";
+
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = BlockType.Grass;
+        b.maxHP = 3;
+        b.dropcount = 1;
+        b.mineable = true;
+
+
+    }
+    private void PlaceWater(int x, int y, int z)
     {
         var go = Instantiate(waterPrefab, new Vector3(x, y, z), Quaternion.identity, transform);
-        go.name = $"B_{x}_{y}_{z}";
-        tileInfos.Add(new TileInfo
-        {
-            tileX = x,
-            tileY = y,
-            tileZ = z,
-            tileType = "Water"
-        });
+        go.name = $"Water_{x}_{y}_{z}";
+
+        var b = go.GetComponent<Block>() ?? go.AddComponent<Block>();
+        b.type = BlockType.Water;
+        b.maxHP = 3;
+        b.dropcount = 1;
+        b.mineable = false;
+
     }
 
 

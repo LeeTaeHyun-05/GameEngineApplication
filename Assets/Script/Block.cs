@@ -1,0 +1,51 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public enum BlockType { Dirt, Grass, Water }
+
+public class Block : MonoBehaviour
+{
+    [Header("Block Stat")]
+    public BlockType type = BlockType.Dirt;
+    public int maxHP = 3;
+    [HideInInspector] public int hp;
+
+    public int dropcount = 1;
+    public bool mineable = true;
+
+    void Awake()
+    {
+        hp = maxHP;
+        if (GetComponent<Collider>() == null) gameObject.AddComponent<BoxCollider>();
+        if (string.IsNullOrEmpty(gameObject.tag) || gameObject.tag == "Untagged")
+            gameObject.tag = "Block";
+    }
+
+    public void Hit(int damage, Inventory inven)
+    {
+        if (!mineable) return;
+
+        hp -= damage;
+
+        if (hp <= 0)
+        {
+            if (inven != null && dropcount > 0)
+                inven.Add(type, dropcount);
+
+            Destroy(gameObject);
+        }
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+}
