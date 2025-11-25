@@ -90,6 +90,21 @@ public class NoiseVoxelMap : MonoBehaviour
         b.mineable = false;
 
     }
+    public void PlaceTile(Vector3Int pos, BlockType type)
+    {
+        switch (type)
+        {
+            case BlockType.Dirt:
+                PlaceDirt(pos.x, pos.y, pos.z);
+                break;
+            case BlockType.Grass:
+                PlaceGrass(pos.x, pos.y, pos.z);
+                break;
+            case BlockType.Water:
+                PlaceWater(pos.x, pos.y, pos.z);
+                break;
+        }
+    }
 
 
     // Update is called once per frame
